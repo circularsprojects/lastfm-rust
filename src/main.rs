@@ -1,23 +1,13 @@
 use axum::{
-    Router, body::Bytes, extract::ws::{Message, Utf8Bytes, WebSocket, WebSocketUpgrade}, response::IntoResponse, routing::{any, get}
+    Router, routing::{get}
 };
 use tokio::sync::{Mutex, broadcast};
 
-use std::{ops::ControlFlow, sync::Arc};
-use std::{net::SocketAddr, path::PathBuf};
-use tower_http::{
-    services::ServeDir,
-    trace::{DefaultMakeSpan, TraceLayer},
-};
+use std::{sync::Arc};
+use std::{net::SocketAddr};
+use tower_http::{trace::{DefaultMakeSpan, TraceLayer}};
 
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-
-//allows to extract the IP of connecting user
-use axum::extract::connect_info::ConnectInfo;
-use axum::extract::ws::CloseFrame;
-
-//allows to split the websocket stream into separate TX and RX branches
-use futures_util::{sink::SinkExt, stream::StreamExt};
 
 use crate::httpclient::poll_lastfm;
 
@@ -26,6 +16,9 @@ mod httpclient;
 
 #[tokio::main]
 async fn main() {
+    let lastfm_api_key = dotenv::var("LASTFM_API_KEY").expect("LASTFM_API_KEY must be set in env vars");
+    let lastfm_username = dotenv::var("LASTFM_USERNAME").expect("LASTFM_USERNAME must be set in env vars");
+
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
@@ -51,7 +44,7 @@ async fn main() {
 
     tracing::debug!("Listening on {}", listener.local_addr().unwrap());
 
-    tokio::spawn(poll_lastfm(state.clone()));
+    tokio::spawn(poll_lastfm(state.clone(), lastfm_api_key, lastfm_username));
 
     axum::serve(
         listener, 

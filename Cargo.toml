@@ -13,3 +13,4 @@ futures-util = { version = "0.3", default-features = false, features = ["sink", 
 headers = "0.4"
 tower-http = { version = "0.6.1", features = ["fs", "trace"] }
 reqwest = { version = "0.13.2", features = ["json"] }
+dotenv = "0.15.0"
