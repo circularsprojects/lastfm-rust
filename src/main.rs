@@ -16,13 +16,14 @@ mod httpclient;
 
 #[tokio::main]
 async fn main() {
+    let port = dotenv::var("PORT").unwrap_or_else(|_| "3000".to_string());
     let lastfm_api_key = dotenv::var("LASTFM_API_KEY").expect("LASTFM_API_KEY must be set in env vars");
     let lastfm_username = dotenv::var("LASTFM_USERNAME").expect("LASTFM_USERNAME must be set in env vars");
 
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
-                format!("{}=debug,tower_http=debug", env!("CARGO_CRATE_NAME")).into()
+                "info".into()
             }),
         )
         .with(tracing_subscriber::fmt::layer())
@@ -38,11 +39,11 @@ async fn main() {
                 .make_span_with(DefaultMakeSpan::default().include_headers(true)),
         );
     
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
+    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port))
         .await
         .unwrap();
 
-    tracing::debug!("Listening on {}", listener.local_addr().unwrap());
+    tracing::info!("Listening on {}", listener.local_addr().unwrap());
 
     tokio::spawn(poll_lastfm(state.clone(), lastfm_api_key, lastfm_username));
 
