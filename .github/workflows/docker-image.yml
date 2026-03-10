@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  deployments: write
+  packages: write
+  contents: read
+
 jobs:
 
   build:
