@@ -738,6 +738,7 @@ dependencies = [
  "futures-util",
  "headers",
  "reqwest",
+ "serde_json",
  "tokio",
  "tokio-tungstenite",
  "tower-http",
