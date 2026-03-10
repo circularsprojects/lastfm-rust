@@ -13,3 +13,20 @@ LASTFM_USERNAME=circular_ (also self explanatory. also required)
 ```
 
 setting `RUST_LOG` to `"info,lastfm_rust=debug,tower_http=debug"` will also give you some useful debug logs
+
+## docker compose
+
+you can also run this via docker!
+
+example `docker-compose.yml`:
+```yaml
+services:
+    lastfm-rust:
+        image: ghcr.io/circularsprojects/lastfm-rust:latest
+        restart: unless-stopped
+        environment:
+            - LASTFM_API_KEY=1234567890abcdef1234567890abcd
+            - LASTFM_USERNAME=circular_
+        ports:
+            - 3000:3000
+```
